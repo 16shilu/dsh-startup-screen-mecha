@@ -7,6 +7,7 @@ import { EventEmitter } from 'node:events'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import { createHash } from 'node:crypto'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const PLUGIN_ROOT = fileURLToPath(new URL('..', import.meta.url))
@@ -142,26 +143,45 @@ check('splash.js 非空', r.body.length > 20000, r.body.length + ' bytes')
 console.log('\n[3b] 音频素材路由')
 r = await call('prefix /dsh-startup/asset')
 check('请求 /asset 无文件名 -> 404', r.statusCode === 404, String(r.statusCode))
-r = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/sfx-tick.mp3')
-check('sfx-tick.mp3 -> 200 + audio/mpeg', r.statusCode === 200 && r.headers['Content-Type'] === 'audio/mpeg', r.headers['Content-Type'])
-check('sfx-tick.mp3 有内容', r.body.length > 500, r.body.length + ' bytes')
+r = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/mecha-ui-click.wav')
+check('游戏点击音效 -> 200 + audio/wav', r.statusCode === 200 && r.headers['Content-Type'] === 'audio/wav', r.headers['Content-Type'])
+check('游戏音效具有 RIFF/WAVE 文件头', r.body.startsWith('RIFF') && r.body.includes('WAVE'))
+r = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/mecha-emblem.png')
+check('原始图标通过素材路由提供 PNG MIME', r.statusCode === 200 && r.headers['Content-Type'] === 'image/png')
+const iconBytes = fs.readFileSync(path.join(PLUGIN_ROOT, 'lib/assets/mecha-emblem.png'))
+check('静态图标与用户提供的透明 PNG 原字节一致', createHash('sha256').update(iconBytes).digest('hex') === '3429f7cfe4beded9e053f7008837c1c09a8c5f25191bdd7672031abf2e73136c')
+r = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/mecha-emblem-animated.gif')
+check('官方循环动画通过素材路由提供 GIF MIME', r.statusCode === 200 && r.headers['Content-Type'] === 'image/gif' && r.body.startsWith('GIF89a'))
+const animatedBytes = fs.readFileSync(path.join(PLUGIN_ROOT, 'lib/assets/mecha-emblem-animated.gif'))
+check('动态图标保留官方发布文件原字节', createHash('sha256').update(animatedBytes).digest('hex') === 'bdaa2efb956c1d0da9e52542012e576875e80d0c24ceec90f85a5273cb1f60c2')
+const wordmarkBytes = fs.readFileSync(path.join(PLUGIN_ROOT, 'lib/assets/mecha-logo-cn.png'))
+check('中文 Logo 与用户原文件一致', createHash('sha256').update(wordmarkBytes).digest('hex') === '6484ffe10f3d56a58c32f7585765af63f4a114aba666db6e3c823ca630d50a43')
+r = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/%ZZ.svg')
+check('畸形资源 URL 返回 400', r.statusCode === 400)
 r = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/../../package.json')
 check('目录穿越被拒 -> 404', r.statusCode === 404, String(r.statusCode))
 r = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/nope.mp3')
 check('不存在的素材 -> 404', r.statusCode === 404, String(r.statusCode))
-for (const f of ['line-1', 'line-2', 'line-3', 'line-4', 'line-5']) {
-  const rr = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/' + f + '.mp3')
-  check('真声素材 ' + f + '.mp3 -> 200', rr.statusCode === 200 && rr.body.length > 5000, rr.statusCode + ' ' + rr.body.length)
+for (const f of ['particles', 'sync', 'system', 'welcome', 'startup']) {
+  const rr = await call('prefix /dsh-startup/asset', 'GET', undefined, '/dsh-startup/asset/mecha-voice-' + f + '.wav')
+  check('游戏原声 ' + f + ' -> 200', rr.statusCode === 200 && rr.headers['Content-Type'] === 'audio/wav' && rr.body.length > 5000)
 }
 
 console.log('\n[4] 配置读写落盘')
 r = await call('exact /dsh-startup/config')
 let cfg = JSON.parse(r.body)
 check('GET config ok', cfg.ok === true)
-check('默认身份名称 = JOYCE MOORE', cfg.config.identity === 'JOYCE MOORE', cfg.config.identity)
+check('默认使用游戏原始录音和音效', cfg.config.voiceSource === 'asset' && cfg.config.sfx === 'audio' && cfg.config.voiceCue === false)
+check('默认原声不添加开口延迟', cfg.config.voiceLead === 0)
+check('默认身份名称 = PILOT 0087', cfg.config.identity === 'PILOT 0087', cfg.config.identity)
 check('默认身份编号 = 0087', cfg.config.identityId === '0087', cfg.config.identityId)
 check('返回了配置文件路径', typeof cfg.file === 'string' && cfg.file.startsWith(SMOKE_HOME), cfg.file)
 check('返回了插件版本号（设置面板顶部要显示它）', typeof cfg.version === 'string' && /^\d+\.\d+\.\d+/.test(cfg.version), cfg.version)
+
+fs.writeFileSync(cfg.file, JSON.stringify({ identity: '旧版驾驶员', soundVolume: 0.3, voiceSource: 'tts', sfx: 'synth' }))
+const migrated = JSON.parse((await call('exact /dsh-startup/config')).body).config
+check('升级旧版配置自动切换到游戏音源', migrated.voiceSource === 'asset' && migrated.sfx === 'audio' && migrated.audioPack === 'mecha-original-v1')
+check('升级保留身份与音量', migrated.identity === '旧版驾驶员' && migrated.soundVolume === 0.3)
 
 r = await call('exact /dsh-startup/config', 'POST', JSON.stringify({ patch: { identity: '琉璃', speed: 99, enabled: 'true' } }))
 cfg = JSON.parse(r.body)
@@ -169,7 +189,7 @@ check('POST config ok', cfg.ok === true)
 check('身份名称写入成功（中文）', cfg.config.identity === '琉璃', cfg.config.identity)
 check('speed 被夹到上限 3', cfg.config.speed === 3, String(cfg.config.speed))
 check('enabled 字符串 "true" 被转成 boolean true', cfg.config.enabled === true, String(cfg.config.enabled))
-check('配置已落盘', fs.existsSync(path.join(SMOKE_HOME, 'dsh-startup.json')))
+check('配置已落盘', fs.existsSync(path.join(SMOKE_HOME, 'dsh-startup-mecha.json')))
 
 r = await call('exact /dsh-startup/config', 'POST', JSON.stringify({ patch: { identityId: '' } }))
 check('身份编号留空 + 纯中文名 → 兜底 OPERATOR', JSON.parse(r.body).config.identityId === 'OPERATOR', JSON.parse(r.body).config.identityId)
@@ -178,11 +198,11 @@ check('身份编号留空 + 英文名 → 自动派生 ADALOVELACE', JSON.parse(
 r = await call('exact /dsh-startup/config', 'POST', JSON.stringify({ patch: { speed: 0.01, theme: 'neon', accent: 'javascript:alert(1)' } }))
 cfg = JSON.parse(r.body)
 check('speed 低于下限被夹到 0.35', cfg.config.speed === 0.35, String(cfg.config.speed))
-check('非法 theme 回落到 light', cfg.config.theme === 'light', cfg.config.theme)
-check('非法颜色回落到默认橙', cfg.config.accent === '#ff7500', cfg.config.accent)
+check('非法 theme 回落到 dark', cfg.config.theme === 'dark', cfg.config.theme)
+check('非法颜色回落到默认青', cfg.config.accent === '#36eee2', cfg.config.accent)
 
 r = await call('exact /dsh-startup/config', 'POST', JSON.stringify({ action: 'reset' }))
-check('reset 恢复默认', JSON.parse(r.body).config.identity === 'JOYCE MOORE')
+check('reset 恢复默认', JSON.parse(r.body).config.identity === 'PILOT 0087')
 
 /* 液态玻璃：默认关闭，三个数值字段都要夹在合法区间 */
 cfg = JSON.parse((await call('exact /dsh-startup/config')).body)

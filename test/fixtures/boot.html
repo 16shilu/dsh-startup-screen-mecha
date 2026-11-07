@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Browser regression fixture</title>
+  <link rel="icon" type="image/png" href="../../lib/assets/mecha-emblem.png">
+  <link rel="stylesheet" href="../../lib/splash.css">
+  <style>
+    * { box-sizing: border-box; }
+    html,body { margin:0; height:100%; background:#07111a; color:#e9f3f6; font-family:"Microsoft YaHei",system-ui,sans-serif; }
+    html.dsu-lock,html.dsu-lock body { overflow:hidden; }
+    #mockApp { position:fixed; inset:0; display:grid; grid-template-columns:230px 1fr; background:#0b121b; }
+    #mockApp nav { padding:36px 23px; border-right:1px solid #1f2d39; background:#0e1822; }
+    #mockApp .brand { font:600 18px "Bahnschrift",sans-serif; letter-spacing:.12em; margin-bottom:45px; color:#d2e7ed; }
+    #mockApp .item { padding:13px 12px; margin-bottom:9px; color:#698090; font-size:12px; }
+    #mockApp .item.on { color:#7de7db; background:#132c34; border-left:2px solid #36eee2; }
+    #mockApp main { padding:36px 5vw; }
+    #mockApp header { display:flex; justify-content:space-between; font:10px monospace; letter-spacing:.1em; color:#6b8292; }
+    #mockApp article { margin:16vh auto 0; max-width:680px; }
+    #mockApp .eyebrow { color:#36eee2; font:10px monospace; letter-spacing:.22em; }
+    #mockApp h1 { font-size:36px; letter-spacing:.1em; margin:22px 0; }
+    #mockApp p { color:#8a9fae; font-size:13px; line-height:1.9; }
+    #mockApp .prompt { margin-top:32px; padding:25px; border:1px solid #263b4a; background:#10202b; color:#b2c9d5; font-size:12px; }
+    #mockApp .note { position:absolute; bottom:22px; right:25px; color:#475e70; font-size:10px; }
+    #console { position:fixed; left:50%; top:14px; transform:translateX(-50%); z-index:2147483600; font-size:11px; color:#c5d8e0; }
+    #console .toolbar { display:flex; align-items:center; justify-content:center; gap:1px; background:#10212c; border:1px solid #2a4755; box-shadow:0 8px 30px #0005; }
+    #console button { border:0; background:transparent; color:#b6cdd7; padding:9px 13px; font:inherit; cursor:pointer; }
+    #console button:hover { background:#1a3540; color:#36eee2; }
+    #console button:focus-visible { outline:2px solid #36eee2; outline-offset:-2px; }
+    #console .pane { width:320px; max-height:75vh; overflow:auto; padding:20px; border:1px solid #2a4755; background:#0a1724f5; margin-top:6px; backdrop-filter:blur(12px); box-shadow:0 15px 55px #0008; }
+    #console .pane[hidden] { display:none; }
+    #console .field { display:grid; gap:8px; margin-bottom:17px; }
+    #console label { color:#8fa9b8; }
+    #console input[type=text],#console select { background:#122532; color:#deebf0; border:1px solid #2d4554; padding:9px; width:100%; font:inherit; border-radius:0; }
+    #console .check { display:flex; align-items:center; gap:8px; margin:14px 0; }
+    #console input { accent-color:#36eee2; }
+    #console input[type=range] { width:100%; }
+    #console .hint { padding-top:12px; border-top:1px solid #263e4c; color:#627f90; font-size:10px; line-height:1.8; }
+    @media(max-width:700px) { #console { top:auto; bottom:10px; } #console .pane { position:absolute; bottom:40px; left:50%; transform:translateX(-50%); } #mockApp { grid-template-columns:130px 1fr; } #mockApp nav { padding:28px 12px; } #mockApp h1 { font-size:25px; } }
+  </style>
+</head>
+<body>
+  <div id="mockApp">
+    <nav><div class="brand">DSH / WORKSPACE</div><div class="item on">新建会话</div><div class="item">工作区</div><div class="item">会话记录</div><div class="item">设置与插件</div></nav>
+    <main><header><span>DEEPSEEK HARNESS</span><span>LOCAL WORKSPACE / ONLINE</span></header><article><div class="eyebrow">NEURAL LINK ESTABLISHED</div><h1>工作区已就绪。</h1><p>启动序列结束后，将在这里进入你的 DSH 工作区。</p><div class="prompt">今天想一起完成什么？</div></article></main>
+    <div class="note">预览用背景 · 正式插件揭幕后显示你的 DSH 页面</div>
+  </div>
+  <div id="dsh-startup-root" class="dsu-root dsu-boot"></div>
+  <script>
+    var previewParams = new URLSearchParams(location.search);
+    window.__DSH_STARTUP_SCRIPT_URL__ = '../../lib/splash.js';
+    window.__DSH_STARTUP_ASSET_BASE__ = '../../lib/assets/';
+    window.__DSH_STARTUP__ = {
+      enabled:true, mode:'always', theme:previewParams.get('theme') || 'dark',
+      speed:Number(previewParams.get('speed')) || 1,
+      requireInteraction:previewParams.get('autoplay') !== '1', allowSkip:true,
+      voice:previewParams.get('voice') !== '0', voiceSource:'asset',
+      sound:previewParams.get('sound') !== '0', sfx:'audio'
+    };
+    document.documentElement.classList.add('dsu-lock');
+  </script>
+  <script defer src="../../lib/splash.js"></script>
+  <aside id="console" data-dsu-preview-ui aria-label="动画预览工具">
+    <div class="toolbar">
+      <button id="btnReplay" type="button">↻ 重播</button>
+      <button id="btnSkip" type="button">跳过</button>
+      <button id="btnSettings" type="button" aria-expanded="false" aria-controls="previewSettings">预览设置 ⌄</button>
+      <button id="btnHide" type="button" title="刷新页面可再次显示">隐藏</button>
+    </div>
+    <div class="pane" id="previewSettings" hidden>
+      <div class="field"><label for="fIdentity">驾驶员名称</label><input id="fIdentity" type="text" value="PILOT 0087" maxlength="48"></div>
+      <div class="field"><label for="fId">接入编号</label><input id="fId" type="text" value="0087" maxlength="12"></div>
+      <div class="field"><label for="fLevel">同步等级</label><input id="fLevel" type="text" value="3" maxlength="12"></div>
+      <div class="field"><label for="fTheme">主题</label><select id="fTheme"><option value="dark">深空 · 驾驶员终端</option><option value="light">极地 · 战术诊断</option></select></div>
+      <div class="field"><label for="fSpeed">速度 <span id="fSpeedVal">1.00×</span></label><input id="fSpeed" type="range" min="0.35" max="3" step="0.05" value="1"></div>
+      <label class="check"><input id="fInteract" type="checkbox" checked>第 1、2 步需要确认</label>
+      <label class="check"><input id="fVoice" type="checkbox" checked>游戏原始中文播报</label>
+      <label class="check"><input id="fSound" type="checkbox" checked>游戏原始界面音效</label>
+      <label class="check"><input id="fGlass" type="checkbox" checked>磨砂玻璃底板</label>
+      <div class="hint">改完点「重播」。使用官方透明循环动画与原图 Logo，系统启用减少动态效果时显示静态图标。首次点击后开启游戏原声。</div>
+    </div>
+  </aside>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      if (previewParams.get('clean') === '1') $('console').hidden = true;
+      $('fTheme').value = window.__DSH_STARTUP__.theme;
+      $('fSpeed').value = window.__DSH_STARTUP__.speed;
+      $('fSpeedVal').textContent = Number($('fSpeed').value).toFixed(2) + '×';
+      $('fInteract').checked = window.__DSH_STARTUP__.requireInteraction;
+      $('fVoice').checked = window.__DSH_STARTUP__.voice;
+      $('fSound').checked = window.__DSH_STARTUP__.sound;
+      $('fSpeed').addEventListener('input', function () { $('fSpeedVal').textContent = Number(this.value).toFixed(2) + '×'; });
+      $('btnSettings').addEventListener('click', function () {
+        $('previewSettings').hidden = !$('previewSettings').hidden;
+        this.setAttribute('aria-expanded', String(!$('previewSettings').hidden));
+      });
+      $('btnHide').addEventListener('click', function () { $('console').hidden = true; });
+      $('btnSkip').addEventListener('click', function () { if (window.__DSH_STARTUP_API__) window.__DSH_STARTUP_API__.skip(); });
+      $('btnReplay').addEventListener('click', function () {
+        window.__DSH_STARTUP__ = Object.assign({}, window.__DSH_STARTUP__, {
+          identity:$('fIdentity').value || 'PILOT 0087', identityId:$('fId').value,
+          accessLevel:$('fLevel').value || '3', theme:$('fTheme').value,
+          speed:Number($('fSpeed').value), requireInteraction:$('fInteract').checked,
+          voice:$('fVoice').checked, sound:$('fSound').checked, glass:$('fGlass').checked
+        });
+        if (window.__DSH_STARTUP_API__) window.__DSH_STARTUP_API__.replay();
+      });
+      $('console').addEventListener('keydown', function (e) { e.stopPropagation(); });
+    })();
+  </script>
+</body>
+</html>

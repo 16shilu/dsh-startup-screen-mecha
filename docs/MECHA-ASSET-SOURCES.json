@@ -1,0 +1,315 @@
+{
+  "edition": "mecha-animated-v1",
+  "icon": {
+    "source": "provided/triangle_icon_extracted.png",
+    "png": "mecha-emblem.png",
+    "pngSha256": "3429f7cfe4beded9e053f7008837c1c09a8c5f25191bdd7672031abf2e73136c",
+    "width": 660,
+    "height": 605,
+    "method": "User-supplied transparent PNG copied byte-for-byte."
+  },
+  "method": "Original installed Wwise events decoded with wwiser v20260808 and vgmstream r2168. PCM WAV, original rate and channels. No speech synthesis, pitch shifting or time stretching. Startup segments are contiguous PCM slices with no samples removed.",
+  "audio": [
+    {
+      "file": "mecha-ui-click.wav",
+      "event": "Play_UI_Common_Click_S",
+      "eventId": 3319809639,
+      "sources": [
+        {
+          "id": 800294902,
+          "language": "SFX",
+          "package": "GeneratedSoundBanks/Windows/000003.pck",
+          "offset": 3279599,
+          "bytes": 6726,
+          "wemSha256": "814ebbfdabf7ba0e098fb554785bd9526db0a5afbfb69881c235ef9f269d5346"
+        }
+      ],
+      "sha256": "81ce8e34c291bd016afada488143193962fcd959b2d6ff5a0adba2cbfddc6545",
+      "pcmSha256": "8c922d785f2f46f86cb3d07b52520dca0538abac9460de075585066a13bd839e",
+      "decodedEventSha256": "81ce8e34c291bd016afada488143193962fcd959b2d6ff5a0adba2cbfddc6545",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 0,
+      "endFrame": 8377,
+      "seconds": 0.1899546485260771
+    },
+    {
+      "file": "mecha-ui-confirm.wav",
+      "event": "Play_UI_Common_Confirm",
+      "eventId": 3954010905,
+      "sources": [
+        {
+          "id": 783124378,
+          "language": "SFX",
+          "package": "GeneratedSoundBanks/Windows/000079.pck",
+          "offset": 2766404,
+          "bytes": 18169,
+          "wemSha256": "d656b83913f03483af84b500bbd0d826be05637f5a00972073148b524b39e974"
+        }
+      ],
+      "sha256": "781410050ebd554744df2a67bdc86b9607861fd1eddd5173dd868e16f0c7c742",
+      "pcmSha256": "94068bf78e698f6bf3f556b0802622cbbb36490562a6511e871e88c7159723b0",
+      "decodedEventSha256": "781410050ebd554744df2a67bdc86b9607861fd1eddd5173dd868e16f0c7c742",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 0,
+      "endFrame": 39165,
+      "seconds": 0.888095238095238
+    },
+    {
+      "file": "mecha-ui-hover.wav",
+      "event": "Play_UI_Common_Hover_S",
+      "eventId": 2825152041,
+      "sources": [
+        {
+          "id": 69439598,
+          "language": "SFX",
+          "package": "GeneratedSoundBanks/Windows/000099.pck",
+          "offset": 49564,
+          "bytes": 10810,
+          "wemSha256": "42ab28b1bf6756c549ed56103d75861bf90aa5ac23f99506a9a38f350939d2cf"
+        }
+      ],
+      "sha256": "4b6521067901378cad4f87647758078c79d69a16f9e01610c15c58273cdd6512",
+      "pcmSha256": "11b70f17e524f22f8d9df0eec823646e8f9670912607bf087aadd30f41b487e6",
+      "decodedEventSha256": "4b6521067901378cad4f87647758078c79d69a16f9e01610c15c58273cdd6512",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 0,
+      "endFrame": 22611,
+      "seconds": 0.5127210884353741
+    },
+    {
+      "file": "mecha-ui-transition.wav",
+      "event": "Play_UI_MainScreen_Transition",
+      "eventId": 1203797250,
+      "sources": [
+        {
+          "id": 689116587,
+          "language": "SFX",
+          "package": "GeneratedSoundBanks/Windows/000088.pck",
+          "offset": 3156553,
+          "bytes": 30097,
+          "wemSha256": "dc19a5a0fcea3d2313e562e4148c77bd4854c3350f0de01da0bef1179de520a7"
+        },
+        {
+          "id": 840510832,
+          "language": "SFX",
+          "package": "GeneratedSoundBanks/Windows/000033.pck",
+          "offset": 8304382,
+          "bytes": 23843,
+          "wemSha256": "828a63fe166113ac788ab3566b6a46d099474ca99b59f6275e0e4f10f22b2ecf"
+        },
+        {
+          "id": 189968962,
+          "language": "SFX",
+          "package": "GeneratedSoundBanks/Windows/000063.pck",
+          "offset": 4526039,
+          "bytes": 29581,
+          "wemSha256": "6f72b4fbb2e48231eb0bf513b2b62c0fb437769077cd24b1c1ae6bf53c089c55"
+        }
+      ],
+      "sha256": "56f8e826e6db68471f55fd9c9a3be35f3fdd6a91938084f1572129441097a175",
+      "pcmSha256": "9ab0cd60dc5893cb069ed679722ffac5398449f33130522bfa6328a76ffa646f",
+      "decodedEventSha256": "56f8e826e6db68471f55fd9c9a3be35f3fdd6a91938084f1572129441097a175",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 0,
+      "endFrame": 50573,
+      "seconds": 1.1467800453514738
+    },
+    {
+      "file": "mecha-ui-start.wav",
+      "event": "Play_UI_MainScreen_Operation_Start_0317",
+      "eventId": 1300754913,
+      "sources": [
+        {
+          "id": 135647956,
+          "language": "SFX",
+          "package": "GeneratedSoundBanks/Windows/000057.pck",
+          "offset": 218156,
+          "bytes": 33398,
+          "wemSha256": "6ccb2a44f46bcff148fd8539826e36ab6ea19e976e4ed163428ff94a77825fe5"
+        }
+      ],
+      "sha256": "a638ec79e0934dd5727a049c27ce9dd58de8a21843d937ca30c38f0232832903",
+      "pcmSha256": "250cf054c46e608fba4f3d4801d637d1d6572751a238b4b1f85f107caa6ca180",
+      "decodedEventSha256": "a638ec79e0934dd5727a049c27ce9dd58de8a21843d937ca30c38f0232832903",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 0,
+      "endFrame": 76031,
+      "seconds": 1.7240589569160998
+    },
+    {
+      "file": "mecha-ui-ready.wav",
+      "event": "Play_UI_MainScreen_Common_Confirm_0317",
+      "eventId": 745398959,
+      "sources": [
+        {
+          "id": 609010497,
+          "language": "SFX",
+          "package": "GeneratedSoundBanks/Windows/000098.pck",
+          "offset": 2144785,
+          "bytes": 32469,
+          "wemSha256": "e773dcd6279d7ef7d9cdcfb76e65bd75b3669c16f241d9e25bb0a79d070c9f1d"
+        }
+      ],
+      "sha256": "474150e9d31dde0a8aed2d901607c0d6dcbb07e5f7551c74478312a545cec3d7",
+      "pcmSha256": "ecad4650edd93e90fc1cde8787919fd97ddf812fcb7ddcad1da0d242c963b11c",
+      "decodedEventSha256": "474150e9d31dde0a8aed2d901607c0d6dcbb07e5f7551c74478312a545cec3d7",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 0,
+      "endFrame": 73838,
+      "seconds": 1.674331065759637
+    },
+    {
+      "file": "mecha-voice-startup.wav",
+      "event": "Play_Vox_Launch_Animation_Chord_System_01",
+      "eventId": 204792911,
+      "sources": [
+        {
+          "id": 647456760,
+          "language": "Chinese",
+          "package": "GeneratedSoundBanks/Windows/Chinese/000061.pck",
+          "offset": 2053536,
+          "bytes": 101115,
+          "wemSha256": "af94464467d85a0c6641d6c8a90349a972a7111de9491901cb3dcc85545a3379"
+        }
+      ],
+      "sha256": "7954813d7dd55ae117e940ce7692eaebadcec71b15e51f4d69f3809ac77840ea",
+      "pcmSha256": "a7284a2950933fa4b86726084e0aed13defc56bd62a8e0c0e0438867aabeff83",
+      "decodedEventSha256": "7954813d7dd55ae117e940ce7692eaebadcec71b15e51f4d69f3809ac77840ea",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 0,
+      "endFrame": 221171,
+      "seconds": 5.015215419501134
+    },
+    {
+      "file": "mecha-voice-particles.wav",
+      "event": "Play_Vox_Launch_Animation_Chord_System_01",
+      "eventId": 204792911,
+      "sources": [
+        {
+          "id": 647456760,
+          "language": "Chinese",
+          "package": "GeneratedSoundBanks/Windows/Chinese/000061.pck",
+          "offset": 2053536,
+          "bytes": 101115,
+          "wemSha256": "af94464467d85a0c6641d6c8a90349a972a7111de9491901cb3dcc85545a3379"
+        }
+      ],
+      "sha256": "f3fc92e1a32fa6495957b64ec83eff9ded5473a973a3fa0243469ed96c6fab9f",
+      "pcmSha256": "4b3b1a8ec829f09a2bbc5267d82041adb36bbc78d4dc04c2b5e63ea534ef561a",
+      "decodedEventSha256": "7954813d7dd55ae117e940ce7692eaebadcec71b15e51f4d69f3809ac77840ea",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 0,
+      "endFrame": 61740,
+      "seconds": 1.4
+    },
+    {
+      "file": "mecha-voice-sync.wav",
+      "event": "Play_Vox_Launch_Animation_Chord_System_01",
+      "eventId": 204792911,
+      "sources": [
+        {
+          "id": 647456760,
+          "language": "Chinese",
+          "package": "GeneratedSoundBanks/Windows/Chinese/000061.pck",
+          "offset": 2053536,
+          "bytes": 101115,
+          "wemSha256": "af94464467d85a0c6641d6c8a90349a972a7111de9491901cb3dcc85545a3379"
+        }
+      ],
+      "sha256": "0e32ac37ee19384c26744916fd914a8006a05464ba22485f9735d9a8d084e376",
+      "pcmSha256": "4c8e9f7761287d03b0b7f9deca2450bf78331e79174e2d66df1c6c57246afbb4",
+      "decodedEventSha256": "7954813d7dd55ae117e940ce7692eaebadcec71b15e51f4d69f3809ac77840ea",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 61740,
+      "endFrame": 138474,
+      "seconds": 1.74
+    },
+    {
+      "file": "mecha-voice-system.wav",
+      "event": "Play_Vox_Launch_Animation_Chord_System_01",
+      "eventId": 204792911,
+      "sources": [
+        {
+          "id": 647456760,
+          "language": "Chinese",
+          "package": "GeneratedSoundBanks/Windows/Chinese/000061.pck",
+          "offset": 2053536,
+          "bytes": 101115,
+          "wemSha256": "af94464467d85a0c6641d6c8a90349a972a7111de9491901cb3dcc85545a3379"
+        }
+      ],
+      "sha256": "7e7544504ee2c1423129037270749c50947a1e0563c3714f5265ac1262d63b83",
+      "pcmSha256": "bd9866aa07fb9f3b98c51838b4e4677af2fd6b71275ba47936139ec0a1b6fb1a",
+      "decodedEventSha256": "7954813d7dd55ae117e940ce7692eaebadcec71b15e51f4d69f3809ac77840ea",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 138474,
+      "endFrame": 221171,
+      "seconds": 1.8752154195011337
+    },
+    {
+      "file": "mecha-voice-welcome.wav",
+      "event": "Play_Vox_MainScreen_Welcome_Back",
+      "eventId": 3476683564,
+      "sources": [
+        {
+          "id": 121962405,
+          "language": "Chinese",
+          "package": "GeneratedSoundBanks/Windows/Chinese/000006.pck",
+          "offset": 507528,
+          "bytes": 15793,
+          "wemSha256": "c699f8454beab2eb4b5e8a2a4b6bc68a64ce24fb000c62ffe1243c76ad0823a7"
+        }
+      ],
+      "sha256": "fbe726cc5fe340d0cf8846116fd58d4a0b23708ce20775abcb73ebcb88c7c6ce",
+      "pcmSha256": "56aada38c2064262cbd4b0e37d04effe0838186033cf2f820a02614543c03a93",
+      "decodedEventSha256": "fbe726cc5fe340d0cf8846116fd58d4a0b23708ce20775abcb73ebcb88c7c6ce",
+      "sampleRate": 44100,
+      "channels": 2,
+      "bitsPerSample": 16,
+      "startFrame": 0,
+      "endFrame": 33518,
+      "seconds": 0.7600453514739229
+    }
+  ],
+  "wordmark": {
+    "source": "provided/解限机 logo-CN.png",
+    "png": "mecha-logo-cn.png",
+    "pngSha256": "6484ffe10f3d56a58c32f7585765af63f4a114aba666db6e3c823ca630d50a43",
+    "width": 2243,
+    "height": 977,
+    "method": "User-supplied transparent PNG copied byte-for-byte."
+  },
+  "animation": {
+    "file": "mecha-emblem-animated.gif",
+    "sha256": "bdaa2efb956c1d0da9e52542012e576875e80d0c24ceec90f85a5273cb1f60c2",
+    "source": "https://giphy.com/stickers/MechaBREAK-eic-mecha-break-mechabreak-jlUkYjMqoT9iK87w2B",
+    "download": "https://media.giphy.com/media/jlUkYjMqoT9iK87w2B/giphy.gif",
+    "publisher": "Mecha BREAK official GIPHY account",
+    "width": 240,
+    "height": 203,
+    "frames": 51,
+    "loopMilliseconds": 6000,
+    "transparent": true,
+    "method": "Official published loading animation copied byte-for-byte, not extracted from the local game. Native local UI bundles use a custom SeasunC container; readable native assets reference UILoginLogoCell but the bundled animation could not be verified."
+  }
+}

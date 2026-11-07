@@ -14,6 +14,7 @@
  * ========================================================================== */
 import fs from 'node:fs'
 import vm from 'node:vm'
+import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 
 const BUNDLE = fileURLToPath(new URL('../lib/splash.js', import.meta.url))
@@ -165,7 +166,7 @@ function run(withSpeech, cfgOverride, env) {
       requireInteraction: true, allowSkip: true,
       identity: 'JOYCE MOORE', identityId: '0087', accessLevel: '3',
       /* 只覆盖测试要变的；语速/音调/留白故意留空，好让断言直接校验 splash.js 出厂默认值 */
-      voice: true, voiceLang: 'en', voiceName: '',
+      voice: true, voiceLang: 'en', voiceName: '', voiceSource: 'tts', voiceLead: 240,
       sound: true, soundVolume: 0.5,
     },
     AudioContext: function () {
@@ -244,8 +245,12 @@ function run(withSpeech, cfgOverride, env) {
   /* 配置覆盖必须在跑脚本之前生效 —— splash.js 只在加载时读一次配置 */
   Object.assign(windowStub.__DSH_STARTUP__, cfgOverride || {})
 
+  Object.assign(windowStub, E.windowOverride || {})
+  Object.assign(sandbox, E.globals || {})
+  if (E.patch) E.patch(windowStub, documentStub, sandbox)
   vm.createContext(sandbox)
-  const src = fs.readFileSync(BUNDLE, 'utf8')
+  let src = fs.readFileSync(BUNDLE, 'utf8')
+  if (E.instrument) src = src.replace('  /* 对外 API：', '  window.__TEST_INTERNALS__ = { audio: audio, wait: wait };\n  /* 对外 API：')
   let thrown = null
   try {
     vm.runInContext(src, sandbox, { filename: 'splash.js' })
@@ -334,16 +339,16 @@ speech.cancelCalls = 0
 api.skip()
 check('按跳过时才真的掐断（cancel 1 次）', speech.cancelCalls === 1, 'cancel ' + speech.cancelCalls + ' 次')
 
-console.log('\n[8] 终幕用 line-6 欢迎语（自制落幕词，3.73 秒）')
+console.log('\n[8] 游戏原始启动播报与欢迎语')
 {
   const src = fs.readFileSync(BUNDLE, 'utf8')
   check('全程没有 voice.tts( 调用（不再用 TTS 念白）', !/voice\.tts\(/.test(src))
-  check('终幕挂了 line-6 素材', /voice\.line\(null, null, 'line-6'\)/.test(src))
+  check('终幕挂了游戏欢迎回来录音', /voice\.line\([^\n]+'mecha-voice-welcome'\)/.test(src))
   check('五步念白用各自素材', /voice\.line\(step\.say, step\.zh, step\.audio\)/.test(src))
-  check('预加载包含五步与终幕', /ensureAsset\(STEPS\[i\]\.audio\)/.test(src) && /ensureAsset\('line-6'\)/.test(src))
+  check('预加载包含系统播报与终幕', /ensureAsset\(STEPS\[i\]\.audio\)/.test(src) && /ensureAsset\('mecha-voice-welcome'\)/.test(src))
   check('揭幕前会等欢迎语播完', /\.then\(function \(\) \{ return welcome \}\)/.test(src))
-  check('五步仍然各自挂着真声素材', (src.match(/audio: 'line-/g) || []).length === 5)
-  check('总共 6 份人声素材被引用', (src.match(/'line-[1-6]'/g) || []).length >= 6)
+  check('三步使用游戏原始启动录音切片', (src.match(/audio: 'mecha-voice-/g) || []).length === 3)
+  check('前两步只播放交互音效', (src.match(/audio: null/g) || []).length === 2)
 }
 
 console.log('\n[9] 右下角身份读数：不压版心、窄窗口不丢、第 3 幕随身份核验退场')
@@ -370,6 +375,7 @@ console.log('\n[10] 桌面端标题栏同步：仅 Windows 桌面端生效、可
     const el = makeEl('span')
     el.isConnected = true
     el.style.setProperty('background-color', 'var(--dsw-specific-sidebar-fill)')
+    el.style.setProperty('color', 'var(--dsw-alias-label-primary)')
     return el
   }
   const WIN_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -396,8 +402,8 @@ console.log('\n[10] 桌面端标题栏同步：仅 Windows 桌面端生效、可
 
   /* ③ 揭幕还原 */
   chrome.show()
-  check('show() 清掉探针底色', probe.style.getPropertyValue('background-color') === '', JSON.stringify(probe.style.getPropertyValue('background-color')))
-  check('show() 清掉探针符号色', probe.style.getPropertyValue('color') === '')
+  check('show() 还原探针原始底色', probe.style.getPropertyValue('background-color') === 'var(--dsw-specific-sidebar-fill)', JSON.stringify(probe.style.getPropertyValue('background-color')))
+  check('show() 还原探针原始符号色', probe.style.getPropertyValue('color') === 'var(--dsw-alias-label-primary)')
   check('show() 把 html token 也还原', de.style.getPropertyValue('--dsw-specific-sidebar-fill') === '')
 
   /* ④ 探针被应用重挂：缓存节点脱离文档后应重新查找（P1） */
@@ -415,26 +421,26 @@ console.log('\n[10] 桌面端标题栏同步：仅 Windows 桌面端生效、可
   check('macOS 不动探针', macProbe.style.getPropertyValue('background-color') === 'var(--dsw-specific-sidebar-fill)')
 }
 
-console.log('\n[11] 终幕欢迎语：素材完整性与时序')
+console.log('\n[11] 游戏音频完整性、PCM 切片与播放时序')
 {
-  const en = fs.readFileSync(fileURLToPath(new URL('../lib/assets/line-6.mp3', import.meta.url)))
-  check('line-6 是完整落幕词（>20KB；原片那句只有 13.1KB / 0.63s）', en.length > 20000, en.length + ' 字节')
-
-  /* 2026-10-27 换入的落幕词带 ID3v2 头，帧同步不在第 0 字节 —— 要跳过 ID3 再判 */
-  const mp3SyncOk = (b) => {
-    let i = 0
-    if (b.length > 10 && b[0] === 0x49 && b[1] === 0x44 && b[2] === 0x33) {
-      const size = ((b[6] & 0x7f) << 21) | ((b[7] & 0x7f) << 14) | ((b[8] & 0x7f) << 7) | (b[9] & 0x7f)
-      i = 10 + size
-    }
-    return i + 1 < b.length && b[i] === 0xff && (b[i + 1] & 0xe0) === 0xe0
-  }
-  check('MP3 帧头有效（自动跳过 ID3v2）', mp3SyncOk(en), 'first sync @' + (en[0] === 0x49 ? 'ID3 之后' : '0'))
-
-  /* 中文素材已移除：不应再出现在发布包里 */
   const assetDir = fileURLToPath(new URL('../lib/assets/', import.meta.url))
-  const zhLeft = fs.readdirSync(assetDir).filter((n) => n.endsWith('-zh.mp3'))
-  check('不含中文素材（已移除）', zhLeft.length === 0, zhLeft.join(',') || '无')
+  const source = JSON.parse(fs.readFileSync(new URL('../docs/MECHA-ASSET-SOURCES.json', import.meta.url), 'utf8'))
+  function pcm(name) {
+    const bytes = fs.readFileSync(assetDir + name)
+    for (let i = 12; i + 8 <= bytes.length;) {
+      const length = bytes.readUInt32LE(i + 4)
+      if (bytes.toString('ascii', i, i + 4) === 'data') return bytes.subarray(i + 8, i + 8 + length)
+      i += 8 + length + (length % 2)
+    }
+    throw new Error('Missing PCM: ' + name)
+  }
+  for (const row of source.audio) {
+    const bytes = fs.readFileSync(assetDir + row.file)
+    check(row.file + ' 与原始事件导出哈希一致', createHash('sha256').update(bytes).digest('hex') === row.sha256)
+  }
+  const joined = Buffer.concat(['particles', 'sync', 'system'].map(part => pcm('mecha-voice-' + part + '.wav')))
+  check('三段播报拼接与完整启动录音逐采样一致', joined.equals(pcm('mecha-voice-startup.wav')))
+  check('旧版第三方 MP3 已移除', !fs.readdirSync(assetDir).some(name => name.endsWith('.mp3')))
 
   const src = fs.readFileSync(BUNDLE, 'utf8')
   const reveal = src.indexOf("ui.welcome.classList.add('dsu-in')")
@@ -522,8 +528,8 @@ console.log('\n[14] 液态玻璃：透出背景，但主体素材保持不透明
   check('开玻璃时不立即置透明（会露出 DSH 0.2.1 的启动白底）', g.root.style.background !== 'transparent', String(g.root.style.background))
   check('源码里透明是在底板 opacity=1 之后才设置', /ui\.plate\.style\.opacity = '1'[\s\S]{0,400}root\.style\.background = 'transparent'/.test(fs.readFileSync(BUNDLE, 'utf8')))
 
-  const off = run(true)
-  check('默认不开启玻璃', !off.root.classList.contains('dsu-glass'), off.root._cls)
+  const off = run(true, { glass: false })
+  check('关闭玻璃后移除玻璃图层', !off.root.classList.contains('dsu-glass'), off.root._cls)
   check('默认不动根节点背景', !off.root.style.background, String(off.root.style.background))
 
   /* 区间夹取：越界值也要落到合法范围 */
@@ -586,6 +592,57 @@ console.log('\n[16] 背景模糊必须真的生效（contain:paint 回归防线�
   check('背景模糊直接作用于应用本体，且上限 60（超过就成纯色）', /blurAppBackdrop\(Math\.min\(60, backdropBlur\)\)/.test(src))
   check('揭幕会还原应用本体的 filter', /function finish\(\)[\s\S]{0,400}restoreAppBackdrop\(\)/.test(src))
   check('dispose 也会还原', /function dispose\(\)[\s\S]{0,300}restoreAppBackdrop\(\)/.test(src))
+}
+
+console.log('\n[17] 改编版行为回归：时长、音源取消、资源清理')
+{
+  const delays = []
+  const timed = run(false, { speed: 2, voice: false, sound: false }, {
+    instrument: true, globals: { setTimeout(_fn, delay) { delays.push(delay); return delays.length } }
+  })
+  timed.windowStub.__TEST_INTERNALS__.wait(320)
+  check('2 倍速的 320ms 等待只换算一次', delays.at(-1) === 160, String(delays.at(-1)))
+  timed.windowStub.__DSH_STARTUP_API__.dispose()
+
+  let disconnects = 0
+  const listeners = new Map()
+  const managed = run(false, { voice: false, sound: false }, {
+    globals: { MutationObserver: class { observe() {} disconnect() { disconnects++ } } },
+    patch(_win, doc) {
+      doc.addEventListener = (type, fn) => { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(fn) }
+      doc.removeEventListener = (type, fn) => listeners.get(type)?.delete(fn)
+    }
+  })
+  managed.windowStub.__DSH_STARTUP_API__.dispose()
+  check('dispose 断开根节点观察器', disconnects === 1, String(disconnects))
+  check('dispose 移除所有文档键盘与解锁监听', [...listeners.values()].every(set => set.size === 0))
+
+  let stopped = 0, closed = 0
+  class AudioFixture {
+    constructor() { this.state = 'running'; this.currentTime = 0; this.destination = {} }
+    resume() { return Promise.resolve() }
+    decodeAudioData() { return Promise.resolve({ duration: 3.73 }) }
+    createGain() { return { gain: { value: 0 }, connect() {} } }
+    createBufferSource() { return { connect() {}, start() {}, stop() { stopped++ }, disconnect() {} } }
+    close() { closed++; return Promise.resolve() }
+  }
+  const recorded = run(false, { voice: true, sound: false, voiceSource: 'asset' }, {
+    instrument: true, windowOverride: { AudioContext: AudioFixture },
+    globals: { fetch: async () => ({ ok: true, arrayBuffer: async () => new ArrayBuffer(1) }) }
+  })
+  for (let i = 0; i < 20; i++) await Promise.resolve()
+  const playback = recorded.windowStub.__TEST_INTERNALS__.audio.playAssetAndWait('mecha-voice-particles', .8)
+  recorded.windowStub.__DSH_STARTUP_API__.skip()
+  check('跳过调用录音音源 stop()', stopped === 1, String(stopped))
+  check('跳过结算等待中的录音 Promise', await playback === 0)
+  check('跳过释放音频上下文', closed === 1, String(closed))
+
+  const missing = run(true, { voiceSource: 'asset', sound: false }, {
+    globals: { fetch: async () => ({ ok: false }) }
+  })
+  await missing.windowStub.__DSH_STARTUP_API__.speak('Optional text', '不应使用合成语音')
+  check('游戏录音模式不回退到 TTS', missing.spoken.length === 0)
+  missing.windowStub.__DSH_STARTUP_API__.dispose()
 }
 
 console.log('\n============================')

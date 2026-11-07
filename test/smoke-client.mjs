@@ -57,7 +57,7 @@ const windowStub = {
 const CFG = {
   enabled: true, mode: 'session', theme: 'light', speed: 1,
   requireInteraction: true, allowSkip: true, sound: true, soundVolume: 0.5,
-  voice: true, voiceLang: 'en', voiceName: '', voiceRate: 1, voicePitch: 1, voiceVolume: 0.9,
+  voice: true, voiceLang: 'en', voiceName: '', voiceRate: 1, voicePitch: 1, voiceVolume: 0.9, voiceSource: 'tts',
   identity: 'JOYCE MOORE', identityId: '0087', accessLevel: '3',
   brand1: 'DEEPSEEK', brand2: 'SYNTHESIZE INTELLIGENCE', brand3a: 'HARNESS', brand3b: 'OS',
   orgZh: '深度求索', orgEn: 'DEEPSEEK', orgSub: 'DEEPSEEK HARNESS',
@@ -164,7 +164,7 @@ check('渲染出「权限等级」字段', texts.includes('权限等级'))
 const idInput = find(tree, (n) => n.type === 'input' && n.props.type === 'text' && n.props.value === 'JOYCE MOORE')
 check('身份名称输入框回填了当前配置', !!idInput, idInput && idInput.props.value)
 check('渲染出「启动动画」开关', texts.includes('启用启动动画'))
-check('渲染出「女声播报」开关', texts.includes('女声播报（念每一行的英文）'))
+check('渲染出「系统语音播报」开关', texts.includes('系统语音播报'))
 check('渲染出「播报语言」字段', texts.includes('播报语言'))
 check('渲染出「界面音效」开关', texts.includes('界面音效'))
 check('渲染出音色选择（无 speechSynthesis 时给出提示）', texts.includes('音色'))
@@ -187,6 +187,7 @@ check('POST 体是 {patch:{identity:"琉璃",...}}', post && JSON.parse(post.ini
 check('Content-Type 是 application/json', post && post.init.headers['Content-Type'] === 'application/json')
 tree = renderPanel()
 check('保存后提示已保存', JSON.stringify(tree).includes('已保存'), '')
+check('保存结果同步给重播运行时', windowStub.__DSH_STARTUP__.identity === '琉璃', windowStub.__DSH_STARTUP__.identity)
 
 console.log('\n[6] 恢复默认 / 立即预览')
 const resetBtn = find(tree, (n) => n.type === 'button' && n.props.children === '恢复默认')
@@ -196,6 +197,7 @@ const resetPost = requests.filter((r) => r.init && r.init.method === 'POST').pop
 check('恢复默认 POST {action:"reset"}', resetPost && JSON.parse(resetPost.init.body).action === 'reset', resetPost && resetPost.init.body)
 
 windowStub.__DSH_STARTUP_API__ = { replay() { windowStub.__replayed = true } }
+check('恢复默认也同步重播配置', windowStub.__DSH_STARTUP__.identity === CFG.identity)
 tree = renderPanel()
 const previewBtn = find(tree, (n) => n.type === 'button' && n.props.children === '立即预览')
 previewBtn.props.onClick()
@@ -218,7 +220,7 @@ console.log('\n[7] 面板与 README 对齐（音效来源 / 故障色 / 单一�
   }
   collect(t)
   check('面板有「音效来源」控件', labels.some((l) => l.indexOf('音效来源') !== -1), labels.filter((l) => l.indexOf('音效') !== -1).join('|'))
-  check('面板有「故障色 · 红」控件', labels.some((l) => l.indexOf('故障色 · 红') !== -1))
+  check('面板有「故障色 · 紫」控件', labels.some((l) => l.indexOf('故障色 · 紫') !== -1))
   check('只有一处「界面音效」开关（旧「音效」已删）', labels.filter((l) => l === '音效').length === 0)
 
   const ranges = []
