@@ -12,11 +12,10 @@
 
 | 文件 | 用途 |
 | --- | --- |
-| `dsh-startup-screen-mecha-1.4.0-mecha.3.zip` | 转发给朋友的分享包：插件 TGZ、PDF 与 Word 安装说明 |
+| `dsh-startup-screen-mecha-1.4.0-mecha.3.zip` | 完整包：插件 TGZ、PDF 与 Word 安装说明 |
 | `dsh-startup-screen-1.4.0-mecha.3.tgz` | 通过 DSH 命令安装的插件包 |
-| `install-guide.zh-CN.pdf` / `.docx` | 单独下载安装说明，含“dy拾鹭”水印 |
+| `install-guide.zh-CN.pdf` / `.docx` | 单独下载安装说明 |
 
-分享包不含离线预览或“先读我.txt”。图标、动画、音效和播报均随插件提供，运行时不依赖游戏安装目录或外部素材服务。
 
 ## Windows 官方桌面版安装
 
@@ -47,7 +46,7 @@ dsh plugin --profile desktop add ".\dsh-startup-screen-1.4.0-mecha.3.tgz"
 
 前三句系统状态与结尾欢迎语使用游戏原始中文录音。启动录音只在句间停顿处分为三个连续 PCM 片段，拼接后与完整录音逐采样相同；没有变调、变速或 TTS 模仿。前两次人工确认只播放游戏原始按键音效。
 
-主图标使用[解限机官方 GIPHY 发布的透明加载动画](https://giphy.com/stickers/MechaBREAK-eic-mecha-break-mechabreak-jlUkYjMqoT9iK87w2B)：51 帧、约 6 秒循环。该动图不是此次从游戏安装包解出的文件；查找范围见[动画来源记录](docs/MECHA-ANIMATION-SEARCH.md)。透明图标和中文 Logo 保留提供的 PNG 原字节。
+主图标使用[解限机官方 GIPHY 发布的透明加载动画](https://giphy.com/stickers/MechaBREAK-eic-mecha-break-mechabreak-jlUkYjMqoT9iK87w2B)：51 帧、约 6 秒循环。透明图标和中文 Logo 保留提供的 PNG 原字节。
 
 支持深空与极地诊断两套主题、窄屏布局、按钮 / Enter / 空格确认、Esc 跳过、重播及独立语音 / 音效音量。首次点击或按键后开启声音。系统启用“减少动态效果”或动图加载失败时显示静态图标。
 
